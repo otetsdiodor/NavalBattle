@@ -6,7 +6,8 @@ namespace NavalBattle
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            GameBoard gb = new GameBoard();
+            
         }
     }
 }

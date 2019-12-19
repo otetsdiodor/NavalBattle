@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NavalBattle
+namespace NavalBattle.Game.Models
 {
-    public class Point
+    public struct LocalCoords
     {
+        public int Q { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
-        public Point(int x,int y)
+
+        public LocalCoords(int q,int x,int y)
         {
             X = x;
             Y = y;
+            Q = q;
         }
     }
 }

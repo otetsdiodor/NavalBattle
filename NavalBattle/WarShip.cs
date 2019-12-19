@@ -4,7 +4,13 @@ using System.Text;
 
 namespace NavalBattle
 {
-    public class WarShip
+    public class WarShip : BaseShip
     {
+        public WarShip(Point headCoords, int lenght,int speed,Directions direction):base(headCoords,lenght, speed, direction)
+        {   }
+        public void Attack()
+        {
+            Console.WriteLine("ATTACK");
+        }
     }
 }

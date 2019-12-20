@@ -56,35 +56,35 @@ namespace NavalBattle.Game
                     switch (ReversDirection(value.Direction))
                     {
                         case Directions.Left:
-                            globalCoord.X -= i;
+                            globalCoord.X -= 1;
                             break;
                         case Directions.Right:
-                            globalCoord.X += i;
+                            globalCoord.X += 1;
                             break;
                         case Directions.Top:
-                            globalCoord.Y += i;
+                            globalCoord.Y += 1;
                             break;
                         case Directions.Bottom:
-                            globalCoord.Y -= i;
+                            globalCoord.Y -= 1;
                             break;
                     }
 
                     if (CoordsIsValid(globalCoord))
                         Coordslist.Add(globalCoord);
                     else throw new Exception("Ship leavs borders or crosses another borad");
-
-                    foreach (var item in Coordslist)
-                    {
-                        gameField[item.X, item.Y] = 1;
-                    }
-
                 }
+
+                foreach (var item in Coordslist)
+                {
+                    gameField[item.X, item.Y] = 1;
+                }
+
                 ships.Add(coord, value);
                 for (int i = 0; i < length; i++)
                 {
                     for (int j = 0; j < length; j++)
                     {
-                        Console.Write(gameField[i,j] + " ");
+                        Console.Write(gameField[j,i] + " ");
                     }
                     Console.WriteLine("");
                 }
@@ -118,8 +118,8 @@ namespace NavalBattle.Game
                     break;
             }
 
-            ptemp.X = Lenght / 2 + ptemp.X;
-            ptemp.Y = Lenght / 2 + ptemp.Y;
+            ptemp.X = Lenght / 2 + ptemp.X -1;
+            ptemp.Y = Lenght / 2 + ptemp.Y -1;
             return new GlobalCoords(ptemp.X, ptemp.Y);
         }
 

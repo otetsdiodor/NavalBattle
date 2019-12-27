@@ -3,15 +3,19 @@ using NavalBattle.Ships;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ORM;
 
 namespace NavalBattle.Game
 {
     public class GameBoard
     {
-        Dictionary<LocalCoords, BaseShip> ships;
+        //Dictionary<LocalCoords, BaseShip> ships;
+        public int Id { get; set; }
+        public List<LocalCoords> coords { get; set; }
+        public List<BaseShip> ships { get;set; }
         private int[,] gameField;
         private int length;
-        public int Lenght
+        public int Length
         {
             get
             {
@@ -25,46 +29,53 @@ namespace NavalBattle.Game
                     throw new Exception("Number must be even");
             }
         }
-        public GameBoard(int len)
+        public GameBoard(int id,int len, List<LocalCoords> cords, List<BaseShip> ships)
         {
-            Lenght = len;
+            Id = id;
+            Length = len;
             gameField = new int[len, len];
-            ships = new Dictionary<LocalCoords, BaseShip>();
+            coords = cords;
+            this.ships = ships;
         }
-
+        public GameBoard(int id, int len)
+        {
+            Id = id;
+            Length = len;
+            gameField = new int[len, len];
+        }
+        [Skip]
         public BaseShip this [int q,int x, int y]
         {
             get
             {
                 ValidateQuadrant(q);
-                
-                foreach (var ship in ships)
-                    if (ship.Key.X == x && ship.Key.Y == y)
-                
-                        return ship.Value;
+
+                for (int i = 0; i < coords.Count; i++)
+                    if (coords[i].X == x && coords[i].Y == y)
+                        return ships[i];
 
                 return null;
             }
             set
             {
                 ValidateQuadrant(q);
-                var coord = new LocalCoords(q, x, y);
+                var coord = new LocalCoords(Guid.NewGuid().ToString(),Id,this,q, x, y);
                 var globalCoord = ConvertToGlobal(coord);
                 var Coordslist = new List<GlobalCoords>();
                 for (int i = 0; i < value.Length; i++)
                 {
                     switch (ReversDirection(value.Direction))
                     {
-                        case Directions.Left:
-                            globalCoord.X -= 1;
+                        case 180:
+                            globalCoord.X -= 1;    
                             break;
-                        case Directions.Right:
+                        case 0:
                             globalCoord.X += 1;
                             break;
-                        case Directions.Top:
+                        case 90:
                             globalCoord.Y += 1;
                             break;
-                        case Directions.Bottom:
+                        case 270:
                             globalCoord.Y -= 1;
                             break;
                     }
@@ -79,7 +90,8 @@ namespace NavalBattle.Game
                     gameField[item.X, item.Y] = 1;
                 }
 
-                ships.Add(coord, value);
+                coords.Add(coord);
+                ships.Add(value);
                 for (int i = 0; i < length; i++)
                 {
                     for (int j = 0; j < length; j++)
@@ -92,7 +104,7 @@ namespace NavalBattle.Game
         }
         private bool CoordsIsValid(GlobalCoords coords)
         {
-            if (coords.X > Lenght -1 || coords.Y > Lenght -1)
+            if (coords.X > Length -1 || coords.Y > Length -1)
                 return false;
 
             if (gameField[coords.X,coords.Y] == 0)
@@ -118,25 +130,25 @@ namespace NavalBattle.Game
                     break;
             }
 
-            ptemp.X = Lenght / 2 + ptemp.X -1;
-            ptemp.Y = Lenght / 2 + ptemp.Y -1;
+            ptemp.X = Length / 2 + ptemp.X -1;
+            ptemp.Y = Length / 2 + ptemp.Y -1;
             return new GlobalCoords(ptemp.X, ptemp.Y);
         }
 
-        private Directions ReversDirection(Directions direction)
+        private int ReversDirection(int direction)
         {
             switch (direction)
             {
-                case Directions.Left:
-                    return Directions.Right;
-                case Directions.Right:
-                    return Directions.Left;
-                case Directions.Top:
-                    return Directions.Bottom;
-                case Directions.Bottom:
-                    return Directions.Top;
+                case 180:
+                    return 0;
+                case 0:
+                    return 180;
+                case 90:
+                    return 270;
+                case 270:
+                    return 90;
                 default:
-                    return Directions.Top; // ? 
+                    return 90; // ? 
             }
         }
         private bool ValidateQuadrant(int q)
@@ -149,10 +161,10 @@ namespace NavalBattle.Game
         public override string ToString()
         {
             var resultString = "";
-            var ShipsRangeToCenter = new Dictionary<LocalCoords, double>();
+            var ShipsRangeToCenter = new Dictionary<int, double>();
 
-            foreach (var item in ships)
-                ShipsRangeToCenter.Add(item.Key, Math.Sqrt(Math.Pow(item.Key.X, 2) + Math.Pow(item.Key.Y, 2)));
+            for (int i = 0; i < ships.Count; i++)
+                ShipsRangeToCenter.Add(i, Math.Sqrt(Math.Pow(coords[i].X, 2) + Math.Pow(coords[i].Y, 2)));
 
             var ShipsRangesList = ShipsRangeToCenter.ToList();
             ShipsRangesList.Sort((p1, p2) => p1.Value.CompareTo(p2.Value));
